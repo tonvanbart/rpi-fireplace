@@ -2,6 +2,8 @@
 
 A flickering fireplace on the 8x8 LED matrix of a Raspberry Pi Sense HAT.
 
+![The fireplace animation running on a Sense HAT](docs/fireplace.gif)
+
 ## Running it
 
 ```sh
