@@ -29,9 +29,9 @@ PALETTE_STOPS = [         # (heat, colour)
     (0.12, (0, 0, 0)),
     (0.25, (120, 0, 0)),
     (0.40, (255, 30, 0)),
-    (0.55, (255, 120, 0)),
-    (0.75, (255, 200, 40)),
-    (1.00, (255, 200, 40)),
+    (0.55, (255, 70, 0)),
+    (0.75, (255, 130, 0)),     # low green: the LEDs make green look strong
+    (1.00, (255, 130, 0)),
 ]
 
 column_strength = [random.uniform(0.6, 1.0) for _ in range(WIDTH)]

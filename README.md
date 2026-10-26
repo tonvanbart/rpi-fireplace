@@ -55,9 +55,9 @@ startup by interpolating between these stops:
 | 0.12 | black    | (0, 0, 0)     |
 | 0.25 | deep red | (120, 0, 0)   |
 | 0.40 | red      | (255, 30, 0)  |
-| 0.55 | orange   | (255, 120, 0) |
-| 0.75 | yellow   | (255, 200, 40)|
-| 1.00 | yellow   | (255, 200, 40)|
+| 0.55 | orange   | (255, 70, 0)  |
+| 0.75 | yellow   | (255, 130, 0) |
+| 1.00 | yellow   | (255, 130, 0) |
 
 Heat below 0.12 stays black, so the flames get clean edges instead of a dim
 red haze. The stops sit low on the heat scale because the visible rows rarely
