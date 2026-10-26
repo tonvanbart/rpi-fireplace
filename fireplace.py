@@ -10,11 +10,11 @@ import time
 
 from sense_hat import SenseHat
 
-FPS = 15
+FPS = 7
 COOLING_MIN = 0.04
 COOLING_MAX = 0.10
 TOP_EXTRA_COOLING = 0.5   # extra cooling factor at the top row, tapers the flames
-ROTATION = 0              # 0/90/180/270 - adjust so the flames rise upward
+ROTATION = 180              # 0/90/180/270 - adjust so the flames rise upward
 LOW_LIGHT = True
 
 WIDTH = 8
