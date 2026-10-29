@@ -1,7 +1,8 @@
 """Flickering fireplace animation for the Sense HAT 8x8 LED matrix.
 
 Run with:  python3 fireplace.py
-Stop with Ctrl+C (or `kill <pid>`); the LEDs are cleared on exit.
+Stop with Ctrl+C (or `kill <pid>`); the fire burns out and the LEDs are cleared
+on exit.
 """
 
 import random
@@ -17,6 +18,8 @@ TOP_EXTRA_COOLING = 1.5   # extra cooling factor at the top row, tapers the flam
 ROTATION = 180              # 0/90/180/270 - adjust so the flames rise upward
 BRIGHTNESS = 0.4          # 0.0-1.0, scales a linear gamma table
 FUEL_DRIFT = 0.10         # how fast each column's fuel strength wanders
+IGNITE_FRAMES = 8         # frames for the fire to build up on start
+BURNOUT_FRAMES = 6        # frames for the fire to die out on exit
 
 WIDTH = 8
 VISIBLE_ROWS = 8
@@ -109,6 +112,36 @@ def render(heat, palette):
     return pixels
 
 
+def ignite(sense, heat, palette):
+    """Animate the fire building up from cold over IGNITE_FRAMES frames.
+
+    The fuel row is scaled up from weak to full strength, so the flames start
+    small and dim and grow into the normal animation. Modifies heat in place.
+    """
+    for frame in range(IGNITE_FRAMES):
+        add_fuel(heat)
+        ramp = (frame + 1) / IGNITE_FRAMES        # reaches 1 on the last frame
+        heat[HEIGHT - 1] = [value * ramp for value in heat[HEIGHT - 1]]
+        rise(heat)
+        sense.set_pixels(render(heat, palette))
+        time.sleep(1 / FPS)
+
+
+def burn_out(sense, heat, palette):
+    """Animate the fire dying out over BURNOUT_FRAMES frames.
+
+    The reverse of ignite(): the fuel row is scaled down to nothing, so the
+    flames shrink and dim until the grid is black. Modifies heat in place.
+    """
+    for frame in range(BURNOUT_FRAMES):
+        add_fuel(heat)
+        fade = 1 - (frame + 1) / BURNOUT_FRAMES   # reaches 0 on the last frame
+        heat[HEIGHT - 1] = [value * fade for value in heat[HEIGHT - 1]]
+        rise(heat)
+        sense.set_pixels(render(heat, palette))
+        time.sleep(1 / FPS)
+
+
 def handle_sigterm(signum, frame):
     """Turn SIGTERM into SystemExit so main() clears the LEDs on `kill`."""
     raise SystemExit(0)
@@ -117,8 +150,8 @@ def handle_sigterm(signum, frame):
 def main():
     """Set up the Sense HAT and run the animation until interrupted.
 
-    The LEDs are cleared on exit, whether the script is stopped by Ctrl+C,
-    SIGTERM, or an error.
+    The fire builds up on start. On Ctrl+C or SIGTERM it burns out first; the
+    LEDs are cleared on any exit, including an error.
     """
     signal.signal(signal.SIGTERM, handle_sigterm)
     sense = SenseHat()
@@ -129,13 +162,14 @@ def main():
     palette = build_palette()
     heat = [[0.0] * WIDTH for _ in range(HEIGHT)]
     try:
+        ignite(sense, heat, palette)
         while True:
             add_fuel(heat)
             rise(heat)
             sense.set_pixels(render(heat, palette))
             time.sleep(1 / FPS)
-    except KeyboardInterrupt:
-        pass
+    except (KeyboardInterrupt, SystemExit):
+        burn_out(sense, heat, palette)
     finally:
         sense.clear()
 
