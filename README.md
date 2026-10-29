@@ -10,8 +10,11 @@ A flickering fireplace on the 8x8 LED matrix of a Raspberry Pi Sense HAT.
 python3 fireplace.py
 ```
 
-Stop it with Ctrl+C (or `kill <pid>`). The LEDs are cleared on exit. Only the
-`sense_hat` library and the Python standard library are needed.
+On start the fire builds up from small, dim flames to full strength in about a
+second. Stop it with Ctrl+C (or `kill <pid>`) and the fire dies down the same
+way before the LEDs are cleared; press Ctrl+C again to skip that and clear the
+LEDs right away. Only the `sense_hat` library and the Python standard library
+are needed.
 
 ## How the fire works
 
@@ -40,6 +43,11 @@ Every frame (`FPS` times per second):
    before reaching the edge of the display.
 4. **Render** – only the top 8 rows are shown. Each heat value is mapped to a
    colour and all 64 pixels are sent to the matrix at once.
+
+To light the fire and to put it out, the fuel row is scaled up from zero to full
+strength over `IGNITE_FRAMES` frames on start, and back down to zero over
+`BURNOUT_FRAMES` frames on exit. Weaker fuel gives shorter, dimmer flames, so
+the fire grows and shrinks using the same simulation as the normal animation.
 
 The display is dimmed with a linear gamma table scaled by `BRIGHTNESS`, rather
 than the Sense HAT's built-in low-light mode. Low-light mode squeezes each
@@ -78,5 +86,7 @@ The constants at the top of `fireplace.py`:
 | `COOLING_MIN/MAX`   | 0.0 / 0.12 | Range of cooling per row. Higher values give lower flames; a wider range gives more varied flame heights. |
 | `TOP_EXTRA_COOLING` | 1.5     | Extra cooling near the top. Higher values give more pointed flames that stay further from the top edge. |
 | `FUEL_DRIFT`        | 0.10    | How fast each column's fuel strength changes. Higher values make the flames change height more quickly. |
+| `IGNITE_FRAMES`     | 8       | Number of frames the fire takes to build up on start. |
+| `BURNOUT_FRAMES`    | 6       | Number of frames the fire takes to die down on exit. The last frame or two can already be dark, so lower this if the end seems to pause on a black screen. |
 | `ROTATION`          | 180     | 0/90/180/270. Change this if the flames don't rise upward on your setup. |
 | `BRIGHTNESS`        | 0.4     | 0.0–1.0. Scales the LED gamma table; 1.0 is full brightness. |
